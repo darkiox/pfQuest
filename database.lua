@@ -1363,16 +1363,38 @@ function pfDatabase:SearchQuests(meta, maps)
   local meta = meta or {}
 
   local plevel = UnitLevel("player")
-  local pfaction = UnitFactionGroup("player")
-  if pfaction == "Horde" then
-    pfaction = "H"
-  elseif pfaction == "Alliance" then
-    pfaction = "A"
-  else
-    pfaction = "GM"
+  -- local pfaction = UnitFactionGroup("player")
+  -- temp fix for TurtleWow, since client doesn't detect faction correctly.
+  local _, race = UnitRace("player")
+  local horde_races = { "Orc", "Tauren", "Troll", "Scourge", "Goblin"}
+  local alliance_races = { "Human", "Dwarf", "NightElf", "Gnome", "BloodElf"}
+
+  local pfaction = "GM" -- default
+
+  for _, r in ipairs(horde_races) do
+    if race == r then
+      pfaction = "H"
+      break
+    end
   end
 
-  local _, race = UnitRace("player")
+  if pfaction == "GM" then
+    for _, r in ipairs(alliance_races) do
+      if race == r then
+        pfaction = "A"
+        break
+      end
+    end
+  end
+
+  -- if pfaction == "Horde" then
+  --   pfaction = "H"
+  -- elseif pfaction == "Alliance" then
+  --   pfaction = "A"
+  -- else
+  --   pfaction = "GM"
+  -- end
+
   local prace = pfDatabase:GetBitByRace(race)
   local _, class = UnitClass("player")
   local pclass = pfDatabase:GetBitByClass(class)
